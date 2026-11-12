@@ -89,3 +89,62 @@ jobs:
 
       - name: Validate ESM syntax and index.d.ts runtime export contracts
         run: npm run check
+
+  linux-sanitizers:
+    name: Ubuntu ASan + UBSan (Native C++ & N-API Addon)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12 (for node-gyp)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile all targets with -fsanitize=address,undefined
+        shell: bash
+        run: |
+          CFLAGS="-O1 -g -fno-omit-frame-pointer -fsanitize=address,undefined -fno-sanitize-recover=all" \
+          CXXFLAGS="-O1 -g -fno-omit-frame-pointer -fsanitize=address,undefined -fno-sanitize-recover=all" \
+          LDFLAGS="-fsanitize=address,undefined" \
+          npx node-gyp rebuild --arch=x64 --enable_asan=1
+
+      - name: Run standalone C++ test binaries under ASan + LSan + UBSan
+        shell: bash
+        env:
+          ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1:detect_leaks=1:halt_on_error=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+        run: |
+          ./build/Release/aead_test
+          ./build/Release/anti_replay_test
+          ./build/Release/mlkem512_test
+          ./build/Release/zero_rtt_engine_test
+
+      - name: Run Node-API addon test suites under LD_PRELOAD libasan + UBSan
+        shell: bash
+        env:
+          ASAN_OPTIONS: detect_leaks=0:halt_on_error=1:allocator_may_return_null=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+        run: |
+          LIBASAN_PATH=$(gcc -print-file-name=libasan.so)
+          echo "Preloading ASan runtime: ${LIBASAN_PATH}"
+          LD_PRELOAD="${LIBASAN_PATH}" node --test \
+            test/aead.test.mjs \
+            test/mlkem512.test.mjs \
+            test/replay.test.mjs \
+            test/wire.test.mjs \
+            test/zero_rtt.test.mjs \
+            test/epoch_key_manager.test.mjs \
+            test/one_rtt_session.test.mjs \
+            test/secure_secret_finalizer.test.mjs
