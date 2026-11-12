@@ -7,9 +7,11 @@ import path from 'node:path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const addonPath = path.resolve(__dirname, '..', 'build', 'Release', 'lattice_wire_native.node');
 
+const isAsanRun = Boolean(process.env.ASAN_OPTIONS || process.env.LD_PRELOAD?.includes('asan'));
+
 test(
   'secure secret finalizer releases locked pages after the handle is collected',
-  { skip: process.platform !== 'linux' },
+  { skip: process.platform !== 'linux' || isAsanRun },
   () => {
     const script = `
       import assert from 'node:assert/strict';
