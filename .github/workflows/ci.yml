@@ -1,0 +1,91 @@
+name: CI — Native Build, VmLck Telemetry & Contract Gate
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-matrix:
+    name: ${{ matrix.os }} / Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: ['20', '22', '24']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12 (for node-gyp)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+
+      - name: Verify Linux RLIMIT_MEMLOCK (ulimit -l) and /proc/self/status
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          LOCKED_LIMIT=$(ulimit -l)
+          echo "Detected RLIMIT_MEMLOCK (ulimit -l): ${LOCKED_LIMIT} kB"
+          if [ "${LOCKED_LIMIT}" != "unlimited" ] && [ "${LOCKED_LIMIT}" -lt 64 ]; then
+            echo "::error::Insufficient RLIMIT_MEMLOCK (${LOCKED_LIMIT} kB). At least 64 kB is required for mlock CSP tests."
+            exit 1
+          fi
+          grep -E '^Vm(Lck|Peak|Size):' /proc/self/status
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile native addon and C++ test targets
+        run: npm run build:native
+
+      - name: Run standalone C++ cryptographic & anti-replay test binaries (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          ./build/Release/aead_test
+          ./build/Release/anti_replay_test
+          ./build/Release/mlkem512_test
+          ./build/Release/zero_rtt_engine_test
+
+      - name: Run standalone C++ cryptographic & anti-replay test binaries (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./build/Release/aead_test.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Release/anti_replay_test.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Release/mlkem512_test.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Release/zero_rtt_engine_test.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run Node.js unit, 0-RTT/1-RTT integration, and VmLck test suites
+        run: npm test
+
+      - name: Run Linux /proc/self/status VmLck kernel leak gate explicitly
+        if: runner.os == 'Linux'
+        run: node --test test/vmlck_linux.test.mjs
+
+      - name: Validate ESM syntax and index.d.ts runtime export contracts
+        run: npm run check
