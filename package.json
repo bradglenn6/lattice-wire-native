@@ -1,0 +1,24 @@
+{
+  "name": "@zerolabz/wire",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Experimental PQ datagram framing specification and native-addon scaffold",
+  "type": "module",
+  "types": "./index.d.ts",
+  "scripts": {
+    "preinstall": "node -e \"console.log('Install dependencies now; build the native addon explicitly with npm run build:native.')\"",
+    "configure": "node-gyp configure --arch=x64",
+    "build:native": "node-gyp rebuild --arch=x64",
+    "pretest:bench": "npm run build:native",
+    "test:bench": "node test/bench.mjs",
+    "check": "node --check index.js && node --check lib/crypto/EpochKeyManager.js && node --check lib/crypto/OneRttSession.js && node --check test/bench.mjs && node --check test/wire.test.mjs && node --check test/replay.test.mjs && node --check test/aead.test.mjs && node --check test/mlkem512.test.mjs && node --check test/zero_rtt.test.mjs && node --check test/epoch_key_manager.test.mjs && node --check test/one_rtt_session.test.mjs && node --check test/vmlck_linux.test.mjs && node --check test/secure_secret_finalizer.test.mjs && node --check test/types_contract.test.mjs && node --test test/types_contract.test.mjs",
+    "pretest": "npm run build:native",
+    "test": "node --test test/wire.test.mjs test/replay.test.mjs test/aead.test.mjs test/mlkem512.test.mjs test/zero_rtt.test.mjs test/epoch_key_manager.test.mjs test/one_rtt_session.test.mjs test/vmlck_linux.test.mjs test/secure_secret_finalizer.test.mjs test/types_contract.test.mjs",
+    "build": "npm run build:native"
+  },
+  "devDependencies": {
+    "mitata": "^0.1.11",
+    "node-addon-api": "^8.0.0",
+    "node-gyp": "^13.1.0"
+  }
+}
