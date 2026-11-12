@@ -1,4 +1,52 @@
 {
+  "variables": {
+    "enable_asan%": 0
+  },
+  "target_defaults": {
+    "msvs_settings": {
+      "VCCLCompilerTool": {
+        "AdditionalOptions": [
+          "/std:c++20"
+        ],
+        "DisableSpecificWarnings": [
+          "4146"
+        ]
+      }
+    },
+    "conditions": [
+      [
+        "OS=='linux'",
+        {
+          "cflags_cc": [
+            "-std=c++20",
+            "-O2"
+          ]
+        }
+      ],
+      [
+        "OS=='linux' and enable_asan==1",
+        {
+          "cflags": [
+            "-O1",
+            "-g",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "-fno-sanitize-recover=all"
+          ],
+          "cflags_cc": [
+            "-O1",
+            "-g",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "-fno-sanitize-recover=all"
+          ],
+          "ldflags": [
+            "-fsanitize=address,undefined"
+          ]
+        }
+      ]
+    ]
+  },
   "targets": [
     {
       "target_name": "lattice_wire_native",
@@ -33,10 +81,7 @@
       "msvs_settings": {
         "VCCLCompilerTool": {
           "Optimization": 3,
-          "FavorSizeOrSpeed": 1,
-          "AdditionalOptions": [
-            "/std:c++20"
-          ]
+          "FavorSizeOrSpeed": 1
         }
       },
       "conditions": [
@@ -45,15 +90,6 @@
           {
             "libraries": [
               "Advapi32.lib"
-            ]
-          }
-        ],
-        [
-          "OS=='linux'",
-          {
-            "cflags_cc": [
-              "-std=c++20",
-              "-O2"
             ]
           }
         ]
@@ -71,23 +107,9 @@
       ],
       "msvs_settings": {
         "VCCLCompilerTool": {
-          "Optimization": 2,
-          "AdditionalOptions": [
-            "/std:c++20"
-          ]
+          "Optimization": 2
         }
-      },
-      "conditions": [
-        [
-          "OS=='linux'",
-          {
-            "cflags_cc": [
-              "-std=c++20",
-              "-O2"
-            ]
-          }
-        ]
-      ]
+      }
     },
     {
       "target_name": "aead_test",
@@ -103,23 +125,9 @@
       ],
       "msvs_settings": {
         "VCCLCompilerTool": {
-          "Optimization": 2,
-          "AdditionalOptions": [
-            "/std:c++20"
-          ]
+          "Optimization": 2
         }
-      },
-      "conditions": [
-        [
-          "OS=='linux'",
-          {
-            "cflags_cc": [
-              "-std=c++20",
-              "-O2"
-            ]
-          }
-        ]
-      ]
+      }
     },
     {
       "target_name": "mlkem512_test",
@@ -148,10 +156,7 @@
       ],
       "msvs_settings": {
         "VCCLCompilerTool": {
-          "Optimization": 2,
-          "AdditionalOptions": [
-            "/std:c++20"
-          ]
+          "Optimization": 2
         }
       },
       "conditions": [
@@ -160,15 +165,6 @@
           {
             "libraries": [
               "Advapi32.lib"
-            ]
-          }
-        ],
-        [
-          "OS=='linux'",
-          {
-            "cflags_cc": [
-              "-std=c++20",
-              "-O2"
             ]
           }
         ]
@@ -201,10 +197,7 @@
       ],
       "msvs_settings": {
         "VCCLCompilerTool": {
-          "Optimization": 2,
-          "AdditionalOptions": [
-            "/std:c++20"
-          ]
+          "Optimization": 2
         }
       },
       "conditions": [
@@ -213,15 +206,6 @@
           {
             "libraries": [
               "Advapi32.lib"
-            ]
-          }
-        ],
-        [
-          "OS=='linux'",
-          {
-            "cflags_cc": [
-              "-std=c++20",
-              "-O2"
             ]
           }
         ]
@@ -259,10 +243,7 @@
       ],
       "msvs_settings": {
         "VCCLCompilerTool": {
-          "Optimization": 2,
-          "AdditionalOptions": [
-            "/std:c++20"
-          ]
+          "Optimization": 2
         }
       },
       "conditions": [
@@ -271,15 +252,6 @@
           {
             "libraries": [
               "Advapi32.lib"
-            ]
-          }
-        ],
-        [
-          "OS=='linux'",
-          {
-            "cflags_cc": [
-              "-std=c++20",
-              "-O2"
             ]
           }
         ]
