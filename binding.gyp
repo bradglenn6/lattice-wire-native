@@ -17,6 +17,12 @@
       [
         "OS=='linux'",
         {
+          "cflags_cc!": [
+            "-std=gnu++17",
+            "-std=c++17",
+            "-std=gnu++14",
+            "-std=c++14"
+          ],
           "cflags_cc": [
             "-std=c++20",
             "-O2"
