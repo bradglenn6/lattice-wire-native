@@ -1,7 +1,6 @@
 {
   "name": "@zerolabz/wire",
   "version": "0.2.0",
-  "private": true,
   "description": "Experimental PQ datagram framing specification and native-addon scaffold",
   "type": "module",
   "types": "./index.d.ts",

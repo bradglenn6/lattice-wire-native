@@ -1,0 +1,8 @@
+﻿build/
+node_modules/
+.vscode/
+.github/
+.gitattributes
+*.tgz
+SPEC-LATTICE-WIRE-*.md
+test/*.mjs
