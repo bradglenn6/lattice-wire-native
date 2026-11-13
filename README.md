@@ -1,6 +1,6 @@
-[![CI — Native Build, VmLck Telemetry & Contract Gate](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml/badge.svg)](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml)
+﻿[![CI â€” Native Build, VmLck Telemetry & Contract Gate](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml/badge.svg)](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml)
 
-# `@zerolabz/lattice-wire-native`
+# `@zerolabz/wire`
 
 High-assurance, zero-V8-residency post-quantum 0-RTT and 1-RTT transport engine for Node.js.
 

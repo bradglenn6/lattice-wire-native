@@ -1,7 +1,7 @@
 {
   "name": "@zerolabz/wire",
-  "version": "0.2.0",
-  "description": "Experimental PQ datagram framing specification and native-addon scaffold",
+  "version": "0.2.1",
+  "description": "Sub-microsecond C++20 Node-API transport engine implementing SPEC-LATTICE-WIRE-02 (ML-KEM-512, ChaCha20-Poly1305, 0-RTT/1-RTT anti-replay, and mlock secret handles)",
   "type": "module",
   "types": "./index.d.ts",
   "scripts": {
@@ -22,5 +22,23 @@
   },
   "engines": {
     "node": ">=22.12.0"
+  },
+  "keywords": [
+    "post-quantum",
+    "ml-kem-512",
+    "chacha20-poly1305",
+    "zero-rtt",
+    "node-api",
+    "zero-trust",
+    "cryptography",
+    "datagram"
+  ],
+  "homepage": "https://github.com/bradglenn6/lattice-wire-native#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bradglenn6/lattice-wire-native.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bradglenn6/lattice-wire-native/issues"
   }
 }
