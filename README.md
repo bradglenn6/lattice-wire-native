@@ -1,6 +1,6 @@
-﻿[![CI â€” Native Build, VmLck Telemetry & Contract Gate](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml/badge.svg)](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml)
+# @zerolabz/wire
 
-# `@zerolabz/wire`
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23893473.svg)](https://doi.org/10.5281/zenodo.23893473) [![npm version](https://img.shields.io/npm/v/@zerolabz/wire.svg)](https://www.npmjs.com/package/@zerolabz/wire) [![CI](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml/badge.svg)](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 High-assurance, zero-V8-residency post-quantum 0-RTT and 1-RTT transport engine for Node.js.
 
@@ -20,23 +20,4 @@ High-assurance, zero-V8-residency post-quantum 0-RTT and 1-RTT transport engine 
 4. **Two-Phase Inspect-Then-Commit Replay Protection**
    * Both the 0-RTT datagram engine and the fused 1-RTT frame pipeline inspect the sliding replay window *before* running ChaCha20-Poly1305 verification and commit the sequence/nonce state *only after* the 16-byte Poly1305 MAC authenticates. Forged packets cannot advance or poison the replay window, and in-place decryption wipes the buffer if a concurrent replay commit fails.
 5. **Bounded `RLIMIT_MEMLOCK` Footprint (`EpochKeyManager`)**
-   * `EpochKeyManager` maintains at most two active ML-KEM-512 epoch key slots (`#current` and `#previous`), retiring `#previous` prior to allocating a replacement epoch so locked memory never exceeds **2 OS pages** (`8 KB` on `x86_64`), while protecting in-flight 0-RTT decapsulations via `acquireEpoch()` reference leases.
-
----
-
-## Wire Format (`SPEC-LATTICE-WIRE-01` / `02`)
-
-### 0-RTT Datagram Layout (`812-Byte` Header AAD + Variable Payload + `16-Byte` Tag)
-
-```text
-+-----------------------------------------------------------------------+
-|  0..3    MagicU32          (4B)  : 0x4C573031 ("LW01")                |
-|  4..7    KeyEpochId        (4B)  : Big-Endian uint32 Epoch ID         |
-|  8..15   StreamId          (8B)  : Big-Endian uint64 Stream ID        |
-| 16..31   ClientDstKeyId   (16B)  : 128-bit Routing / Destination ID   |
-| 32..43   Nonce96          (12B)  : 96-bit Packet Nonce / Base IV      |
-| 44..811  KemCiphertext   (768B)  : FIPS 203 ML-KEM-512 Ciphertext     |
-+-----------------------------------------------------------------------+
-| 812..N   Ciphertext      (Var)   : ChaCha20 Encrypted Payload         |
-| N..N+16  Poly1305Tag     (16B)   : 128-bit Authentication Tag         |
-+-----------------------------------------------------------------------+
+   * Pre-allocates active, previous, and next epoch keys inside a single unified locked memory pool, guaranteeing total locked RAM stays strictly bounded within unprivileged shell limits (`ulimit -l` defaults down to 64 KiB).
