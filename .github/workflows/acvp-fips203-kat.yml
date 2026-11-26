@@ -1,0 +1,29 @@
+name: NIST ACVP FIPS 203 ML-KEM KAT Gate
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acvp-ml-kem-kat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Build native bindings & install dependencies
+        run: npm ci
+
+      - name: Run NIST ACVP FIPS 203 ML-KEM Known Answer Tests
+        run: node test/acvp-fips203.mjs

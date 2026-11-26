@@ -19,3 +19,4 @@ core.*
 vgcore.*
 .vscode/
 .idea/
+.acvp-cache/
