@@ -25,7 +25,7 @@ jobs:
       - name: Install @cyclonedx/cdxgen
         run: npm install -g @cyclonedx/cdxgen
 
-      - name: Generate CycloneDX 1.7 CBOM (JS + C/C++20 deep crypto scan)
+      - name: Generate CycloneDX 1.7 CBOM
         run: |
           cdxgen \
             --spec-version 1.7 \
@@ -34,7 +34,7 @@ jobs:
             -o cbom.json \
             .
 
-      - name: Enrich CRA/CISA manufacturer & security contact metadata
+      - name: Enrich CRA/CISA metadata & vendored cryptographic assets
         run: |
           jq '
             .metadata.manufacturer = {
@@ -46,7 +46,61 @@ jobs:
               "name": "ZeroLabz",
               "url": ["https://zrolabz.com"],
               "contact": [{"name": "ZeroLabz Security", "email": "dev@zrolabz.com"}]
-            }
+            } |
+            .components = (.components // []) + [
+              {
+                "type": "cryptographic-asset",
+                "bom-ref": "crypto/ml-kem-512",
+                "name": "ML-KEM-512",
+                "description": "Vendored PQClean NIST FIPS 203 ML-KEM-512 key encapsulation mechanism (deps/mlkem512)",
+                "cryptoProperties": {
+                  "assetType": "algorithm",
+                  "algorithmProperties": {
+                    "primitive": "kem",
+                    "parameterSetIdentifier": "512",
+                    "executionEnvironment": "software-plain-ram",
+                    "implementationPlatform": "x86_64",
+                    "cryptoFunctions": ["keygen", "encapsulate", "decapsulate"],
+                    "classicalSecurityLevel": 128,
+                    "nistQuantumSecurityLevel": 1
+                  },
+                  "oid": "2.16.840.1.101.3.4.4.1"
+                }
+              },
+              {
+                "type": "cryptographic-asset",
+                "bom-ref": "crypto/chacha20-poly1305",
+                "name": "ChaCha20-Poly1305",
+                "description": "Vendored Monocypher 4.0.3 AEAD cipher with 812-byte AAD binding (deps/monocypher)",
+                "cryptoProperties": {
+                  "assetType": "algorithm",
+                  "algorithmProperties": {
+                    "primitive": "ae",
+                    "parameterSetIdentifier": "256",
+                    "cryptoFunctions": ["encrypt", "decrypt", "tag"],
+                    "classicalSecurityLevel": 256,
+                    "nistQuantumSecurityLevel": 0
+                  }
+                }
+              },
+              {
+                "type": "cryptographic-asset",
+                "bom-ref": "crypto/shake256",
+                "name": "SHAKE-256",
+                "description": "Domain-separated SHAKE-256 key derivation function (FIPS 202 / deps/mlkem512)",
+                "cryptoProperties": {
+                  "assetType": "algorithm",
+                  "algorithmProperties": {
+                    "primitive": "xof",
+                    "parameterSetIdentifier": "256",
+                    "cryptoFunctions": ["digest", "keyderive"],
+                    "classicalSecurityLevel": 256,
+                    "nistQuantumSecurityLevel": 0
+                  },
+                  "oid": "2.16.840.1.101.3.4.2.12"
+                }
+              }
+            ]
           ' cbom.json > cbom.enriched.json
           mv cbom.enriched.json cbom.json
 
@@ -68,7 +122,8 @@ jobs:
             name,
             assetType: .cryptoProperties.assetType,
             primitive: .cryptoProperties.algorithmProperties.primitive,
-            quantumLevel: .cryptoProperties.algorithmProperties.nistQuantumSecurityLevel
+            quantumLevel: .cryptoProperties.algorithmProperties.nistQuantumSecurityLevel,
+            oid: .cryptoProperties.oid
           }]' cbom.json
 
       - name: Upload CycloneDX CBOM artifact
