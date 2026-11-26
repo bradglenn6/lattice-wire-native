@@ -1,6 +1,7 @@
 # @zerolabz/wire
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23893473.svg)](https://doi.org/10.5281/zenodo.23893473) [![npm version](https://img.shields.io/npm/v/@zerolabz/wire.svg)](https://www.npmjs.com/package/@zerolabz/wire) [![CI](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml/badge.svg)](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23893473.svg)](https://doi.org/10.5281/zenodo.23893473) [![npm version](https://img.shields.io/npm/v/@zerolabz/wire.svg)](https://www.npmjs.com/package/@zerolabz/wire) [![CI](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml/badge.svg)](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![NIST ACVP FIPS 203 ML-KEM KAT Gate](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/acvp-fips203-kat.yml/badge.svg)](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/acvp-fips203-kat.yml)
+[![CycloneDX 1.7 CBOM](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/cbom.yml/badge.svg)](https://github.com/bradglenn6/lattice-wire-native/actions/workflows/cbom.yml)
 
 High-assurance, zero-V8-residency post-quantum 0-RTT and 1-RTT transport engine for Node.js.
 
