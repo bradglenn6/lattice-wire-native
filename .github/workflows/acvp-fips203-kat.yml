@@ -22,8 +22,10 @@ jobs:
         with:
           node-version: 24
 
-      - name: Build native bindings & install dependencies
-        run: npm ci
+      - name: Install dependencies & compile native addon
+        run: |
+          npm ci
+          npx node-gyp rebuild
 
       - name: Run NIST ACVP FIPS 203 ML-KEM Known Answer Tests
         run: node test/acvp-fips203.mjs
